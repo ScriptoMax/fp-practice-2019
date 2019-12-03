@@ -30,7 +30,7 @@ isDateCorrect day month year
     | day > 31 || month > 12 = False
     | day == 29 && month == 2 && not(isLeap year) = False
 	  | day > 29 && month == 2 = False
-	  | day > 30 && month `elem` [4, 6, 9, 11] =  False
+	  | day > 30 && month `elem` [4, 6, 9, 11] = False
     | otherwise = True	
 
     where 
