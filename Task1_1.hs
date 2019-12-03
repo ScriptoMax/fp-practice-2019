@@ -28,7 +28,7 @@ infixl 1 |*|
 -- Заменить переменную `varName` на `replacement`
 -- во всём выражении `expression`
 replaceVar :: String -> Term -> Term -> Term
-replaceVar varName replacement expression = 
+replaceVar varName replacement expression  = 
     case expression of
         Variable exp -> if (exp == varName) then replacement else expression
         BinaryTerm exp1 exp2 -> BinaryTerm (replaceVar varName replacement exp1)(replaceVar varName replacement exp2)	
