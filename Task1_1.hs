@@ -7,7 +7,7 @@ data Term = IntConstant{ intValue :: Int }           -- числовая кон�
             | BinaryTerm{ lhv :: Term, rhv :: Term } -- бинарная операция
             deriving(Show,Eq)
 
-data Math_operation = Addition | Subtraction | Product deriving(Show,Eq)
+data Math_operators = Addition | Subtraction | Product deriving(Show,Eq)
 
 -- Для бинарных операций необходима не только реализация, но и адекватные
 -- ассоциативность и приоритет
