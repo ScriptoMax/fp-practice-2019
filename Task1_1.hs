@@ -7,17 +7,23 @@ data Term = IntConstant{ intValue :: Int }           -- числовая кон�
             | BinaryTerm{ lhv :: Term, rhv :: Term } -- бинарная операция
             deriving(Show,Eq)
 
+data Math_operation = Addition | Subtraction | Product deriving(Show,Eq)
+
 -- Для бинарных операций необходима не только реализация, но и адекватные
 -- ассоциативность и приоритет
 (|+|) :: Term -> Term -> Term
-(|+|) (IntConstant l)(IntConstant r) = IntConstant (l + r)
-(|+|) (BinaryTerm (IntConstant l1)(IntConstant r1))(BinaryTerm (IntConstant l2)(IntConstant r2)) = BinaryTerm (IntConstant (l1 + r1))(IntConstant (l2 + r2))
+(|+|) :: Term -> Term -> Term
+(|+|) a b = BinaryTerm a Addition b   			
+			
 (|-|) :: Term -> Term -> Term
-(|-|) (IntConstant l)(IntConstant r) = IntConstant (l - r)
-(|-|) (BinaryTerm (IntConstant l1)(IntConstant r1))(BinaryTerm (IntConstant l2)(IntConstant r2)) = BinaryTerm (IntConstant (l1 - r1))(IntConstant (l2 - r2))
+(|-|) a b = BinaryTerm a Subtraction b 
+
 (|*|) :: Term -> Term -> Term
-(|*|) (IntConstant l)(IntConstant r) = IntConstant (l * r)
-(|*|) (BinaryTerm (IntConstant l1)(IntConstant r1))(BinaryTerm (IntConstant l2)(IntConstant r2)) = BinaryTerm (IntConstant (l1 * r1))(IntConstant (l2 * r2))
+(|*|) a b = BinaryTerm a Product b 				
+			
+infixl 0 |+|
+infixl 0 |-|
+infixl 1 |*|  
 
 -- Заменить переменную `varName` на `replacement`
 -- во всём выражении `expression`
@@ -30,4 +36,12 @@ replaceVar varName replacement expression =
 -- Посчитать значение выражения `Term`
 -- если оно состоит только из констант
 evaluate :: Term -> Term
-evaluate expression = todo
+evaluate expression = 
+	case expression of 
+		BinaryTerm a op b ->
+			case(evaluate (a), op, evaluate (b)) of
+				(IntConstant a, Addition, IntConstant b) -> IntConstant(a + b)
+				(IntConstant a, Subtraction, IntConstant b) -> IntConstant(a - b)
+				(IntConstant a, Product, IntConstant b) -> IntConstant(a * b)
+				_ -> BinaryTerm a op b
+		_ -> expression		
