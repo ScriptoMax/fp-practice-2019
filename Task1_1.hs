@@ -2,16 +2,15 @@ module Task1_1 where
 
 import Todo(todo)
 
+data Math_operators = Addition | Subtraction | Product deriving(Show,Eq)
+
 data Term = IntConstant{ intValue :: Int }           -- числовая константа
             | Variable{ varName :: String }          -- переменная
-            | BinaryTerm{ lhv :: Term, rhv :: Term } -- бинарная операция
+            | BinaryTerm{ lhv :: Term, mat::Math_operators, rhv :: Term } -- бинарная операция
             deriving(Show,Eq)
-
-data Math_operators = Addition | Subtraction | Product deriving(Show,Eq)
 
 -- Для бинарных операций необходима не только реализация, но и адекватные
 -- ассоциативность и приоритет
-(|+|) :: Term -> Term -> Term
 (|+|) :: Term -> Term -> Term
 (|+|) a b = BinaryTerm a Addition b   			
 			
@@ -31,7 +30,7 @@ replaceVar :: String -> Term -> Term -> Term
 replaceVar varName replacement expression = 
     case expression of
         Variable exp -> if (exp == varName) then replacement else expression
-        BinaryTerm exp1 exp2 -> BinaryTerm (replaceVar varName replacement exp1)(replaceVar varName replacement exp2)	
+        BinaryTerm exp1 op exp2 -> BinaryTerm (replaceVar varName replacement exp1) op (replaceVar varName replacement exp2)	
 
 -- Посчитать значение выражения `Term`
 -- если оно состоит только из констант
