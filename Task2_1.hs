@@ -13,7 +13,6 @@ import Todo(todo)
 data TreeMap v = ChangeMe
 
 -- Пустое дерево
-<<<<<<< HEAD
 emptyTree :: TreeMap v 
 emptyTree = Leaf 
 
@@ -40,22 +39,6 @@ insert' (k, v) (Node pair tree_r tree_l)
 	| k == fst pair = error "A node with same key already exists"
 	| k < fst pair = Node pair (insert' (k, v) tree_r) tree_l 
 	| otherwise = Node pair tree_r (insert' (k, v) tree_l)
-=======
-emptyTree :: TreeMap v
-emptyTree = todo
-
--- Содержится ли заданный ключ в дереве?
-contains :: TreeMap v -> Integer -> Bool
-contains t k = todo
-
--- Значение для заданного ключа
-lookup :: Integer -> TreeMap v -> v
-lookup k t = todo
-
--- Вставка пары (ключ, значение) в дерево
-insert :: (Integer, v) -> TreeMap v -> TreeMap v
-insert (k, v) t = todo
->>>>>>> 082dcd4f723eb0a16f8d71128fbb4b20b8e1373e
 
 -- Удаление элемента по ключу
 remove :: Integer -> TreeMap v -> TreeMap v
@@ -63,7 +46,6 @@ remove i t = todo
 
 -- Поиск ближайшего снизу ключа относительно заданного
 nearestLE :: Integer -> TreeMap v -> (Integer, v)
-<<<<<<< HEAD
 nearestLE i x@(Node pair tree_l tree_r) = if i < fst pair 
 														then error "There is no key which is less than input one" else findCloser pair x 
 	where
@@ -86,17 +68,6 @@ treeFromList (x:xs) = insert' x (treeFromList xs)
 listFromTree :: TreeMap v -> [(Integer, v)]
 listFromTree Leaf = []
 listFromTree (Node pair tree_r tree_l) = pair : listFromTree tree_r ++ listFromTree tree_l
-=======
-nearestLE i t = todo
-
--- Построение дерева из списка пар
-treeFromList :: [(Integer, v)] -> TreeMap v
-treeFromList lst = todo
-
--- Построение списка пар из дерева
-listFromTree :: TreeMap v -> [(Integer, v)]
-listFromTree t = todo
->>>>>>> 082dcd4f723eb0a16f8d71128fbb4b20b8e1373e
 
 -- Поиск k-той порядковой статистики дерева
 kMean :: Integer -> TreeMap v -> (Integer, v)
