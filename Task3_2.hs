@@ -9,6 +9,8 @@ module Task3_2 where
 -}
 
 import Todo(todo)
+import Data.Monoid
+import Data.Functor 
 
 data ReverseList a = RNil | RCons (ReverseList a) a 
 
@@ -60,7 +62,7 @@ instance Semigroup (ReverseList a) where
 	RNil <> RNil = RNil 
 	RNil <> RCons x y = RCons x y
 	RCons x y <> RNil = RCons x y
-	RCons x y <> RCons t u = RCons x y
+	RCons x y <> RCons t u = RCons (RCons (x <> t) y) u 
 	
 instance Functor ReverseList where
 	fmap f RNil = RNil
