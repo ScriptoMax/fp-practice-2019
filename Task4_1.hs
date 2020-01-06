@@ -1,5 +1,9 @@
 module Task4_1 where
 
+import Data.Functor
+import Control.Applicative
+import Control.Monad
+
 {-
   Задание 4.1
   Реализация монады над функцией.
