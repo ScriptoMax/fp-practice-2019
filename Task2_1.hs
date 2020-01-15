@@ -6,11 +6,11 @@ module Task2_1 where
   бинарного дерева поиска (без балансировки) и все операции, приведённые в данном файле
 -}
 
-import Todo(todo)
+--import Todo(todo)
 
 -- Ассоциативный массив на основе бинарного дерева поиска
 -- Ключи - Integer, значения - произвольного типа
-data TreeMap v = ChangeMe
+data TreeMap v = Leaf | Node (Integer, v) (TreeMap v) (TreeMap v) deriving (Ord, Eq, Show) 
 
 -- Пустое дерево
 emptyTree :: TreeMap v 
