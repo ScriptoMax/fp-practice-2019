@@ -80,7 +80,7 @@ atom = number <|> do
 	char ')'
 	return res
 
--- factorial  - `!` set in prior to a number because test function calls have been skipped when `!` followed that number. 
+-- factorial  (`!` set in prior to a number because test function calls have been skipped when `!` followed that number. 
 -- A bit confusing, so it's a kind of whatever to be working) 	
 fact' :: Parser Double
 fact' = do
