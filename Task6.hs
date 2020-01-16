@@ -15,47 +15,53 @@ type Parser a = Parsec String () a
 digit :: Parser Char
 digit = oneOf ['0'..'9']
 
-number :: Parser Integer
-number = read <$> many1 digit
+number :: Parser Double
+number = try calcDouble <|> calcInt  
+
+calcInt :: Parser Double 
+calcInt = read <$> many1 digit
+
+calcDouble :: Parser Double 
+calcDouble = do
+    integ <- many1 digit
+    char '.'
+    decim <- many1 digit
+    pure $ read $ integ <> "." <> decim	 
+ 
+numberFact :: Parser Integer  -- particularly to let parser consume integers strictly as `factorial` inputs     
+numberFact = read <$> many1 digit
 
 fp_char :: Parser String 
 fp_char = many1 digit
-
-fp_number :: Parser Double
-fp_number = read <$> parser where
-	parser = (++) <$> fp_char <*> (option "" $ (:) <$> char '.' <*> fp_char)
 
 applyMany :: a -> [a -> a] -> a
 applyMany x [] = x
 applyMany x (h:t) = applyMany (h x) t
 
-
--- | integer functions |
-
-div_ :: Parser (Integer -> Integer -> Integer)
+div_ :: Parser (Double -> Double -> Double)
 div_= do
 	char '/'
-	return div
+	return (/)
 	
-star :: Parser (Integer -> Integer -> Integer)
+star :: Parser (Double -> Double -> Double)
 star = do
 	char '*'	
 	return (*)	
 	
-plus :: Parser (Integer -> Integer -> Integer)
+plus :: Parser (Double -> Double -> Double)
 plus = do
 	char '+'	
 	return (+)
 	
-minus :: Parser (Integer -> Integer -> Integer)
+minus :: Parser (Double -> Double -> Double)
 minus = do
 	char '-'	
 	return (-)	
 	
-multiplication :: Parser Integer
+multiplication :: Parser Double
 multiplication = do
 	spaces
-	lhv <- atom <|> negation'
+	lhv <- atom <|> fact' <|> negation'
 	spaces
 	t <- many tail
 	return $ applyMany lhv t
@@ -63,12 +69,46 @@ multiplication = do
 				do
 					f <- star <|> div_
 					spaces
-					rhv <- atom <|> negation'
+					rhv <- atom <|> fact' <|> negation'
 					spaces
 					return (`f` rhv)
  	
-	
-addition :: Parser Integer
+atom :: Parser Double
+atom = number <|> do
+	char '('
+	res <- addition
+	char ')'
+	return res
+
+-- factorial  - `!` set in prior to a number because test function calls have been skipped when `!` followed that number. 
+-- A bit confusing, so it's a kind of whatever to be working) 	
+fact' :: Parser Double
+fact' = do
+    spaces
+    char '!'
+    rhv <- numberFact
+    return $ factorial rhv
+
+factorial :: Integer -> Double
+factorial n
+	| n < 0 = error "No factorial exists for negative inputs" 
+	| n == 0 || n == 1 = 1
+	| otherwise = acc n 1
+	where
+	acc 0 a = a
+	acc b a = acc (b-1) (fromIntegral b * a) 	
+
+-- negation	
+negation' :: Parser Double
+negation' = do
+	spaces
+	char '~'
+	rhv <- atom
+	spaces
+	return $ negate rhv	
+
+-- core function to (re)run parser tests calling `parseTest addition {some test string input}`	
+addition :: Parser Double
 addition = do
 	spaces
 	lhv <- multiplication <|> fact' <|> negation'
@@ -83,103 +123,5 @@ addition = do
 					spaces
 					return (`f` rhv)
 					
-atom :: Parser Integer
-atom = number <|> do
-	char '('
-	res <- addition
-	char ')'
-	return res
 
--- factorial 	
-fact' :: Parser Integer
-fact' = do
-	spaces
-	char '!'
-	rhv <- atom 
-	return $ factorial rhv  
 	
-factorial :: Integer -> Integer
-factorial n
-	| n < 0 = error "No factorial exists for negative inputs" 
-	| n == 0 || n == 1 = 1
-	| otherwise = acc n 1
-	where
-	acc 0 a = a
-	acc b a = acc (b-1) (b * a)  
-
--- negation	
-negation' :: Parser Integer
-negation' = do
-	spaces
-	char '~'
-	rhv <- atom
-	spaces
-	return $ negate rhv	
-	
-	
--- | fp functions |
-
-fp_div_ :: Parser (Double -> Double -> Double)
-fp_div_= do
-	char '/'
-	return (/)
-	
-fp_star :: Parser (Double -> Double -> Double)
-fp_star = do
-	char '*'	
-	return (*)	
-	
-fp_plus :: Parser (Double -> Double -> Double)
-fp_plus = do
-	char '+'	
-	return (+)
-	
-fp_minus :: Parser (Double -> Double -> Double)
-fp_minus = do
-	char '-'	
-	return (-)
-
-fp_multiplication :: Parser Double
-fp_multiplication = do
-	spaces
-	lhv <- fp_atom <|> fp_negation'
-	spaces
-	t <- many tail
-	return $ applyMany lhv t
-	where tail =
-				do
-					f <- fp_star <|> fp_div_
-					spaces
-					rhv <- fp_atom <|> fp_negation'
-					spaces
-					return (`f` rhv) 	
-	
-fp_addition :: Parser Double
-fp_addition = do
-	spaces
-	lhv <- fp_multiplication <|> fp_negation'
-	spaces
-	t <- many tail
-	return $ applyMany lhv t
-	where tail =
-				do
-					f <- fp_plus <|> fp_minus
-					spaces
-					rhv <- fp_multiplication <|> fp_negation'
-					spaces
-					return (`f` rhv)
-					
-fp_atom :: Parser Double
-fp_atom = fp_number <|> do
-	char '('
-	res <- fp_addition
-	char ')'
-	return res
-
-fp_negation' :: Parser Double 
-fp_negation' = do
-	spaces
-	char '~'
-	rhv <- fp_atom
-	spaces
-	return $ negate rhv	
